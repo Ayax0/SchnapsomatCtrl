@@ -6,10 +6,13 @@
 #include "Packet.h"
 
 class Schnapsomat {
+    public:
+        static const int BUFFER_SIZE = 64;
     private:
         HardwareSerial* SerialPort;
-        Packet* packet_buffer;
-        void send(String command);
+        Packet *buffer[BUFFER_SIZE];
+        void send(Packet *packet);
+        void ack();
     public:
         Schnapsomat();
         void begin(int  rx, int  tx);

@@ -1,18 +1,10 @@
 #include "Schnapsomat.h"
 #include "Packet.h"
 
-/*
-    Packet IDs
-    0x00 = ack
-    0x01 = nack
-    0x10 = ok
-    0x11 = nok
-    0x20 = cmd
-    0x21 = data
-*/
-
 Schnapsomat::Schnapsomat() {
     SerialPort = new HardwareSerial(1);
+
+    for(int i = 0; i < BUFFER_SIZE; i++) buffer[i] = NULL;
 }
 
 void Schnapsomat::begin(int  rx, int  tx) {
@@ -25,16 +17,8 @@ void Schnapsomat::loop() {
         DeserializationError error = deserializeJson(packet, *SerialPort);
 
         if(error == DeserializationError::Ok) {
-            if(packet_buffer == nullptr) return;
-
-            Packet p(PACKET_CMD);
-            p.data["ack"] = packet["id"] == PACKET_ACK;
-            p.data["ok"] = packet["id"] == PACKET_OK;
-            p.data["timestamp"] = packet_buffer->timestamp;
-            p.exec(SerialPort);
-
-            if(packet["id"] == PACKET_ACK) packet_buffer = packet_buffer->next();
-            if(packet["id"] == PACKET_OK && packet_buffer != nullptr) packet_buffer->exec(SerialPort);
+            if(packet["id"] == PACKET_ACK) ack();
+            if(packet["id"] == PACKET_OK && buffer[0] != NULL) buffer[0]->exec(SerialPort);
         } else {
             Serial.print("SerializationError: ");
             Serial.println(error.c_str());
@@ -44,20 +28,36 @@ void Schnapsomat::loop() {
     }
 }
 
-void Schnapsomat::send(String command) {
-    Packet packet(PACKET_CMD);
-    packet.data["payload"] = command;
-    packet.data["queue"] = packet_buffer != nullptr;
+void Schnapsomat::send(Packet *packet) {
 
-    if(packet_buffer == nullptr) {
-        packet_buffer = &packet;
-        packet_buffer->exec(SerialPort);
-    } else {
-        packet_buffer->queue(&packet);
+    for(int i = 0; i < BUFFER_SIZE; i++) {
+        Serial.print("try: ");
+        Serial.println(i);
+        if(buffer[i] == NULL) {
+            Serial.print("insert at: ");
+            Serial.println(i);
+            buffer[i] = packet;
+
+            if(i == 0) packet->exec(SerialPort);
+            return;
+        }
+    }
+    Serial.println("buffer is full!");
+}
+
+void Schnapsomat::ack() {
+    for(int i = 1; i < BUFFER_SIZE; i++) {
+        if(buffer[i] != NULL) buffer[i - 1] = buffer[i];
+        else buffer[i - 1] = NULL;
     }
 }
 
 void Schnapsomat::dispenseIngredience(String ingredience, int amount) {
-    send("DISP " + ingredience + " " + amount);
+    Packet *packet = new Packet(PACKET_CMD);
+    packet->data["action"] = "DISP";
+    packet->data["ingredience"] = ingredience;
+    packet->data["amount"] = amount;
+
+    send(packet);
 }
 

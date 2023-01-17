@@ -14,15 +14,16 @@
 class Packet {
     private:
         StaticJsonDocument<200> packet;
-        Packet* next_packet;
     public:
+        Packet* next;
         JsonObject data;
         int timestamp;
 
+        Packet();
         Packet(int id);
+        void init(int id);
         void queue(Packet* next);
         void exec(HardwareSerial* SerialPort);
-        Packet* next();
 };
 
 #endif
