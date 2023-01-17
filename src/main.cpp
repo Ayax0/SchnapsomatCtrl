@@ -31,12 +31,20 @@ void setup() {
   tee_z.bind(&master, &recipe_luusbueb);
   kaffee_z.bind(&master, &recipe_luusbueb);
   kaffee_t.bind(&master, &recipe_luusbueb);
+
+  master.dispenseIngredience("1", 5);
+  master.dispenseIngredience("2", 5);
+  master.dispenseIngredience("3", 5);
 }
 
 void loop() {
+  master.loop();
   luusbueb.loop();
   holdrio.loop();
   tee_z.loop();
   kaffee_z.loop();
   kaffee_t.loop();
+
+  master.dispenseIngredience("Test", 5);
+  delay(2000);
 }
