@@ -1,16 +1,13 @@
 #include "Schnapsomat.h"
 #include "Packet.h"
 
-Schnapsomat::Schnapsomat() {
+Schnapsomat::Schnapsomat(int  rx, int  tx) {
     SerialPort = new HardwareSerial(1);
+    SerialPort->begin(115200, SERIAL_8N1, rx, tx);
 
     for(int i = 0; i < BUFFER_SIZE; i++) buffer[i] = NULL;
+    ready = true;
 }
-
-void Schnapsomat::begin(int  rx, int  tx) {
-    SerialPort->begin(9600, SERIAL_8N1, rx, tx);
-}
-
 void Schnapsomat::loop() {
     if(SerialPort->available()) {
         StaticJsonDocument<200> packet;
@@ -18,6 +15,8 @@ void Schnapsomat::loop() {
 
         if(error == DeserializationError::Ok) {
             if(packet["id"] == PACKET_ACK) ack();
+            if(packet["id"] == PACKET_OK) ready = true;
+            if(packet["id"] == PACKET_NOK) ready = false;
             if(packet["id"] == PACKET_OK && buffer[0] != NULL) buffer[0]->exec(SerialPort);
         } else {
             Serial.print("SerializationError: ");
@@ -29,16 +28,13 @@ void Schnapsomat::loop() {
 }
 
 void Schnapsomat::send(Packet *packet) {
-
     for(int i = 0; i < BUFFER_SIZE; i++) {
-        Serial.print("try: ");
-        Serial.println(i);
         if(buffer[i] == NULL) {
-            Serial.print("insert at: ");
+            Serial.print("queue at: ");
             Serial.println(i);
             buffer[i] = packet;
 
-            if(i == 0) packet->exec(SerialPort);
+            if(i == 0 && ready) packet->exec(SerialPort);
             return;
         }
     }
@@ -46,6 +42,7 @@ void Schnapsomat::send(Packet *packet) {
 }
 
 void Schnapsomat::ack() {
+    Serial.println("ack");
     for(int i = 1; i < BUFFER_SIZE; i++) {
         if(buffer[i] != NULL) buffer[i - 1] = buffer[i];
         else buffer[i - 1] = NULL;

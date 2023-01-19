@@ -11,11 +11,11 @@ class Schnapsomat {
     private:
         HardwareSerial* SerialPort;
         Packet *buffer[BUFFER_SIZE];
+        bool ready = false;
         void send(Packet *packet);
         void ack();
     public:
-        Schnapsomat();
-        void begin(int  rx, int  tx);
+        Schnapsomat(int  rx, int  tx);
         void loop();
         void dispenseIngredience(String ingredience, int amount);
 };

@@ -3,7 +3,7 @@
 #include "RecipeButton.h"
 #include "Recipe.h"
 
-Schnapsomat master;
+Schnapsomat master(GPIO_NUM_41, GPIO_NUM_42);
 
 Recipe recipe_luusbueb;
 
@@ -13,9 +13,9 @@ RecipeButton tee_z(GPIO_NUM_13, GPIO_NUM_3, GPIO_NUM_4);
 RecipeButton kaffee_z(GPIO_NUM_15, GPIO_NUM_7, GPIO_NUM_8);
 RecipeButton kaffee_t(GPIO_NUM_14, GPIO_NUM_5, GPIO_NUM_6);
 
-void setup() {
-  master.begin(41, 42);
+long last_msg = 0;
 
+void setup() {
   luusbueb.enable();
   holdrio.enable();
   tee_z.enable();
@@ -45,6 +45,8 @@ void loop() {
   kaffee_z.loop();
   kaffee_t.loop();
 
-  master.dispenseIngredience("Test", 5);
-  delay(2000);
+  if(millis() > (last_msg + 2000)) {
+    master.dispenseIngredience("Test", 5);
+    last_msg = millis();
+  }
 }
