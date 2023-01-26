@@ -3,7 +3,7 @@
 
 Schnapsomat::Schnapsomat(int  rx, int  tx) {
     SerialPort = new HardwareSerial(1);
-    SerialPort->begin(115200, SERIAL_8N1, rx, tx);
+    SerialPort->begin(9600, SERIAL_8N1, rx, tx);
 
     for(int i = 0; i < BUFFER_SIZE; i++) buffer[i] = NULL;
     ready = true;
@@ -15,14 +15,13 @@ void Schnapsomat::loop() {
 
         if(error == DeserializationError::Ok) {
             if(packet["id"] == PACKET_ACK) ack();
+            if(packet["id"] == PACKET_NACK) nack();
             if(packet["id"] == PACKET_OK) ready = true;
             if(packet["id"] == PACKET_NOK) ready = false;
             if(packet["id"] == PACKET_OK && buffer[0] != NULL) buffer[0]->exec(SerialPort);
         } else {
             Serial.print("SerializationError: ");
             Serial.println(error.c_str());
-
-            while(SerialPort->available() > 0) SerialPort->read();
         }
     }
 }
@@ -43,10 +42,20 @@ void Schnapsomat::send(Packet *packet) {
 
 void Schnapsomat::ack() {
     Serial.println("ack");
+    if(buffer[0] != NULL) {
+        delete buffer[0];
+        buffer[0] = NULL;
+    }
+
     for(int i = 1; i < BUFFER_SIZE; i++) {
         if(buffer[i] != NULL) buffer[i - 1] = buffer[i];
         else buffer[i - 1] = NULL;
     }
+}
+
+void Schnapsomat::nack() {
+    Serial.println("nack");
+    if(buffer[0] != NULL) buffer[0]->exec(SerialPort);
 }
 
 void Schnapsomat::dispenseIngredience(String ingredience, int amount) {

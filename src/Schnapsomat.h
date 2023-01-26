@@ -14,6 +14,7 @@ class Schnapsomat {
         bool ready = false;
         void send(Packet *packet);
         void ack();
+        void nack();
     public:
         Schnapsomat(int  rx, int  tx);
         void loop();

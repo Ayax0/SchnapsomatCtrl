@@ -7,11 +7,11 @@ Schnapsomat master(GPIO_NUM_41, GPIO_NUM_42);
 
 Recipe recipe_luusbueb;
 
-RecipeButton luusbueb(GPIO_NUM_16, GPIO_NUM_9, GPIO_NUM_10);
-RecipeButton holdrio(GPIO_NUM_12, GPIO_NUM_1, GPIO_NUM_2);
-RecipeButton tee_z(GPIO_NUM_13, GPIO_NUM_3, GPIO_NUM_4);
-RecipeButton kaffee_z(GPIO_NUM_15, GPIO_NUM_7, GPIO_NUM_8);
-RecipeButton kaffee_t(GPIO_NUM_14, GPIO_NUM_5, GPIO_NUM_6);
+RecipeButton luusbueb(GPIO_NUM_17, GPIO_NUM_10, GPIO_NUM_11);
+RecipeButton holdrio(GPIO_NUM_13, GPIO_NUM_2, GPIO_NUM_3);
+RecipeButton tee_z(GPIO_NUM_14, GPIO_NUM_4, GPIO_NUM_5);
+RecipeButton kaffee_z(GPIO_NUM_16, GPIO_NUM_8, GPIO_NUM_9);
+RecipeButton kaffee_t(GPIO_NUM_15, GPIO_NUM_6, GPIO_NUM_7);
 
 long last_msg = 0;
 
@@ -31,10 +31,6 @@ void setup() {
   tee_z.bind(&master, &recipe_luusbueb);
   kaffee_z.bind(&master, &recipe_luusbueb);
   kaffee_t.bind(&master, &recipe_luusbueb);
-
-  master.dispenseIngredience("1", 5);
-  master.dispenseIngredience("2", 5);
-  master.dispenseIngredience("3", 5);
 }
 
 void loop() {
@@ -45,8 +41,8 @@ void loop() {
   kaffee_z.loop();
   kaffee_t.loop();
 
-  if(millis() > (last_msg + 2000)) {
-    master.dispenseIngredience("Test", 5);
-    last_msg = millis();
-  }
+  // if(millis() > (last_msg + 5000)) {
+  //   last_msg = millis();
+  //   master.dispenseIngredience("traesch", 1);
+  // }
 }
