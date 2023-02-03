@@ -1,48 +1,31 @@
 #include <Arduino.h>
 #include "Schnapsomat.h"
-#include "RecipeButton.h"
-#include "Recipe.h"
+#include "recipe/RecipeButton.h"
 
-Schnapsomat master(GPIO_NUM_41, GPIO_NUM_42);
+#define INGREDIENCE_AMOUNT 6
 
-Recipe recipe_luusbueb;
+Schnapsomat Schnapsomat_Master(GPIO_NUM_41, GPIO_NUM_42);
 
-RecipeButton luusbueb(GPIO_NUM_17, GPIO_NUM_10, GPIO_NUM_11);
-RecipeButton holdrio(GPIO_NUM_13, GPIO_NUM_2, GPIO_NUM_3);
-RecipeButton tee_z(GPIO_NUM_14, GPIO_NUM_4, GPIO_NUM_5);
-RecipeButton kaffee_z(GPIO_NUM_16, GPIO_NUM_8, GPIO_NUM_9);
-RecipeButton kaffee_t(GPIO_NUM_15, GPIO_NUM_6, GPIO_NUM_7);
-
-long last_msg = 0;
+RecipeButton Button1(GPIO_NUM_17, GPIO_NUM_10, GPIO_NUM_11);
+RecipeButton Button2(GPIO_NUM_16, GPIO_NUM_8, GPIO_NUM_9);
+RecipeButton Button3(GPIO_NUM_15, GPIO_NUM_6, GPIO_NUM_7);
+RecipeButton Button4(GPIO_NUM_14, GPIO_NUM_4, GPIO_NUM_5);
+RecipeButton Button5(GPIO_NUM_13, GPIO_NUM_2, GPIO_NUM_3);
 
 void setup() {
-  luusbueb.enable();
-  holdrio.enable();
-  tee_z.enable();
-  kaffee_z.enable();
-  kaffee_t.enable();
+  uint8_t LuusbuebeTee[INGREDIENCE_AMOUNT] = {2, 1, 3, 5, 2, 4};
 
-  recipe_luusbueb.zwetschge = 3;
-  recipe_luusbueb.traesch = 6;
-  recipe_luusbueb.vodka = 1;
+  Button1.setIngredients(LuusbuebeTee, INGREDIENCE_AMOUNT);
+  Button2.setIngredients(LuusbuebeTee, INGREDIENCE_AMOUNT);
+  Button3.setIngredients(LuusbuebeTee, INGREDIENCE_AMOUNT);
 
-  luusbueb.bind(&master, &recipe_luusbueb);
-  holdrio.bind(&master, &recipe_luusbueb);
-  tee_z.bind(&master, &recipe_luusbueb);
-  kaffee_z.bind(&master, &recipe_luusbueb);
-  kaffee_t.bind(&master, &recipe_luusbueb);
+  Schnapsomat_Master.registerButton(0, &Button1);
+  Schnapsomat_Master.registerButton(1, &Button2);
+  Schnapsomat_Master.registerButton(2, &Button3);
+  Schnapsomat_Master.registerButton(3, &Button4);
+  Schnapsomat_Master.registerButton(4, &Button5);
 }
 
 void loop() {
-  master.loop();
-  luusbueb.loop();
-  holdrio.loop();
-  tee_z.loop();
-  kaffee_z.loop();
-  kaffee_t.loop();
-
-  // if(millis() > (last_msg + 5000)) {
-  //   last_msg = millis();
-  //   master.dispenseIngredience("traesch", 1);
-  // }
+  Schnapsomat_Master.loop();
 }

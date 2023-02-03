@@ -1,5 +1,4 @@
 #include "RecipeButton.h"
-#include <Arduino.h>
 
 RecipeButton::RecipeButton(int pin_status, int pin_red, int pin_green) {
     this->pin_status = pin_status;
@@ -10,6 +9,8 @@ RecipeButton::RecipeButton(int pin_status, int pin_red, int pin_green) {
     pinMode(pin_red, OUTPUT);
     pinMode(pin_green, OUTPUT);
     setStatus(STATUS_UNKNOWN);
+
+    for(uint8_t i = 0; i < MAX_INGREDIENCE_AMOUNT; i++) this->recipe[i] = 0;
 }
 
 void RecipeButton::setStatus(int status) {
@@ -34,18 +35,8 @@ void RecipeButton::disable() {
     setStatus(STATUS_DISABLED);
 }
 
-void RecipeButton::bind(Schnapsomat* master, Recipe* recipe) {
-    this->master = master;
-    this->recipe = recipe;
-}
-
-void RecipeButton::loop() {
-    if(isPressed() && isEnabled()) {
-        disable();
-        if(master != NULL && recipe != NULL) {
-            recipe->produce(master);
-        }
-    }
+void RecipeButton::listen(void (*listener)()) {
+    this->listener = listener;
 }
 
 boolean RecipeButton::isPressed() {
@@ -54,4 +45,22 @@ boolean RecipeButton::isPressed() {
 
 boolean RecipeButton::isEnabled() {
     return status == STATUS_ENABLED;
+}
+
+boolean RecipeButton::isUnknown() {
+    return status == STATUS_UNKNOWN;
+}
+
+void RecipeButton::setIngredience(uint8_t index, uint8_t amount) {
+    this->recipe[index] = amount;
+    if(this->status == STATUS_UNKNOWN) enable();
+}
+
+void RecipeButton::setIngredients(uint8_t amounts[], uint8_t array_size) {
+    for(uint8_t i = 0; i < array_size; i++) this->recipe[i] = amounts[i];
+    if(this->status == STATUS_UNKNOWN) enable();
+}
+
+uint8_t RecipeButton::getIngredienceAmount(uint8_t index) {
+    return this->recipe[index];
 }
