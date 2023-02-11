@@ -13,9 +13,9 @@ RecipeButton Button4(GPIO_NUM_14, GPIO_NUM_4, GPIO_NUM_5);
 RecipeButton Button5(GPIO_NUM_13, GPIO_NUM_2, GPIO_NUM_3);
 
 void setup() {
-  uint8_t LuusbuebeTee[INGREDIENCE_AMOUNT] = {1, 6, 0, 0, 0, 0, 0, 3};
-  uint8_t Holdrio[INGREDIENCE_AMOUNT] = {2, 0, 3, 0, 2, 0, 3, 0};
-  uint8_t Tee_Zwaetschgen[INGREDIENCE_AMOUNT] = {2, 0, 3, 0, 2, 0, 0, 3};
+  uint8_t LuusbuebeTee[INGREDIENCE_AMOUNT] = {1, 6, 0, 0, 0, 0, 0, 0};
+  uint8_t Holdrio[INGREDIENCE_AMOUNT] = {2, 0, 3, 0, 2, 0, 0, 0};
+  uint8_t Tee_Zwaetschgen[INGREDIENCE_AMOUNT] = {2, 0, 3, 0, 2, 0, 0, 0};
   uint8_t Kaffee_Zwaetschgen[INGREDIENCE_AMOUNT] = {2, 0, 3, 0, 2, 2, 0, 0};
   uint8_t Kaffee_Traesch[INGREDIENCE_AMOUNT] = {2, 0, 0, 2, 2, 2, 0, 0};
 
