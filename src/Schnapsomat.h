@@ -6,8 +6,8 @@
 #include "util/Buffer.h"
 #include "recipe/RecipeButton.h"
 
-#define MAX_BUTTON_AMOUNT 5
-#define BUTTON_TIMEOUT 10000
+#define MAX_BUTTON_AMOUNT 6
+#define BUTTON_TIMEOUT 12000
 
 #define MAX_HDLC_FRAME_LENGTH 32
 #define FRAME_BOUNDARY_OCTET 0x7E
